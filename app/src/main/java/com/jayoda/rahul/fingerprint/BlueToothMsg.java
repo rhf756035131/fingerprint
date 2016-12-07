@@ -30,9 +30,9 @@ public class BlueToothMsg extends Service {
     private readThread mreadThread = null;
     private clientThread clientConnectThread = null;
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private byte[] revice_date=new byte[32];
-    private int revice_date_length=0;
-    private byte command=0x00;
+    private byte[] revice_date = new byte[32];
+    private int revice_date_length = 0;
+    private byte command = 0x00;
 
     private MsgBinder m_Binder = new MsgBinder();
     private Callback callback;
@@ -40,12 +40,13 @@ public class BlueToothMsg extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand");
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onCreate() {
-
+        Log.d(TAG, "BlueToothMsg onCreate");
         super.onCreate();
 
     }
@@ -53,6 +54,7 @@ public class BlueToothMsg extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "BlueToothMsg onBind");
         return m_Binder;
     }
 
@@ -96,19 +98,22 @@ public class BlueToothMsg extends Service {
         }
 
     }
-    final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-    public  String byteArrayToHexString(byte[] bytes) {
-        char[] hexChars = new char[bytes.length*2];
+
+    final protected static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    public String byteArrayToHexString(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
         int v;
 
-        for(int j=0; j < bytes.length; j++) {
+        for (int j = 0; j < bytes.length; j++) {
             v = bytes[j] & 0xFF;
-            hexChars[j*2] = hexArray[v>>>4];
-            hexChars[j*2 + 1] = hexArray[v & 0x0F];
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
         }
 
         return new String(hexChars);
     }
+
     //读取数据
     private class readThread extends Thread {
         @Override
@@ -131,7 +136,7 @@ public class BlueToothMsg extends Service {
                         byte[] buf_data = new byte[bytes];
                         for (int i = 0; i < bytes; i++) {
                             buf_data[i] = buffer[i];
-                             add_revice_date(buffer[i]);
+                            add_revice_date(buffer[i]);
                         }
                     }
                 } catch (IOException e) {
@@ -143,8 +148,8 @@ public class BlueToothMsg extends Service {
                     }
                     break;
                 }
-                if(getRevice_date()[5]==getCommand()&&checkdata(getRevice_date())){
-                    Log.d(TAG, "revice_date"+byteArrayToHexString(revice_date));
+                if (getRevice_date()[5] == getCommand() && checkdata(getRevice_date())) {
+                    Log.d(TAG, "revice_date" + byteArrayToHexString(revice_date));
                     del_revice_date();
                 }
             }
@@ -152,7 +157,7 @@ public class BlueToothMsg extends Service {
     }
 
     private byte getCommand() {
-        Log.d(TAG, "command="+command);
+        Log.d(TAG, "command=" + command);
         return command;
     }
 
@@ -174,6 +179,7 @@ public class BlueToothMsg extends Service {
     private byte[] getRevice_date() {
         return revice_date;
     }
+
     private int getRevice_date_length() {
         return revice_date_length;
     }

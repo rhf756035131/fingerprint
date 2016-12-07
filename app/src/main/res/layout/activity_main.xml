@@ -20,13 +20,16 @@
             android:id="@+id/user_manage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/all_user" ></Button>
+            android:text="@string/all_user" >
+        </Button>
 
         <Button
             android:id="@+id/all_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/all_data" ></Button>
+            android:text="@string/all_data" >
+        </Button>
+
     </LinearLayout>
 
 </RelativeLayout>
