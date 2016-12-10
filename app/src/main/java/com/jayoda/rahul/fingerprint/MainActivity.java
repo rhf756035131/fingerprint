@@ -73,12 +73,12 @@ public class MainActivity extends AppCompatActivity {
             // TODO Auto-generated method stub
             switch (v.getId()) {
                 case R.id.user_manage:
-                    myBinder.sendCommand(BT_command.cmd_collect_finger);
-                    //Toast.makeText(MainActivity.this, "采集指纹", Toast.LENGTH_SHORT).show();
+                    Intent FMin=new Intent(MainActivity.this,ReportActivity.class);
+                    startActivity(FMin);
                     break;
                 case R.id.all_date:
-                    myBinder.sendCommand(BT_command.cmd_read_single_date);
-                    //Toast.makeText(MainActivity.this, "所有数据", Toast.LENGTH_SHORT).show();
+                    Intent peportin=new Intent(MainActivity.this,ReportActivity.class);
+                    startActivity(peportin);
                     break;
                 default:
                     break;

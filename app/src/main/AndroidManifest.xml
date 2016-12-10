@@ -21,11 +21,18 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
-        <service android:name=".BlueToothMsg">
-        </service>
+        <service android:name=".BlueToothMsg"></service>
+
+        <activity android:name=".ReportActivity"></activity>
+        <activity android:name=".FingerprintManageActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

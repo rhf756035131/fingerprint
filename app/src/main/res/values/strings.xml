@@ -2,4 +2,5 @@
     <string name="app_name">Fingerprint</string>
     <string name="all_user">All user</string>
     <string name="all_data">All data</string>
+    <string name="waiting">Waiting...</string>
 </resources>
