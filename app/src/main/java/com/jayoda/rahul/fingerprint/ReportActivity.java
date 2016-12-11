@@ -19,7 +19,7 @@ public class ReportActivity extends PreferenceActivity{
     private Preference NITPreference;
     private Preference LEUPreference;
     private Preference VCPreference;
-    BlueToothMsg myService = MainActivity.myBinder.getService();
+    private BlueToothMsg myService = MainActivity.myBinder.getService();
 
     public  final String TAG = "BlueToothService";
     @Override

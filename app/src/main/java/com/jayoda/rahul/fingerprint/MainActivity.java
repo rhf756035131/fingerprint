@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
             // TODO Auto-generated method stub
             switch (v.getId()) {
                 case R.id.user_manage:
-                    Intent FMin=new Intent(MainActivity.this,ReportActivity.class);
+                    Intent FMin=new Intent(MainActivity.this,FingerprintManageActivity.class);
                     startActivity(FMin);
                     break;
                 case R.id.all_date:
