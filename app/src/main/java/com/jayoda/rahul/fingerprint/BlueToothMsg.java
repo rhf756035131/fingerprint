@@ -15,6 +15,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -30,12 +31,13 @@ public class BlueToothMsg extends Service {
     private readThread mreadThread = null;
     private clientThread clientConnectThread = null;
     private BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-    private byte[] revice_date = new byte[32];
+    private byte[] revice_date = new byte[256];
     private int revice_date_length = 0;
     private byte command = 0x00;
 
     private MsgBinder m_Binder = new MsgBinder();
     private Callback callback;
+    private AllDateCallback alldatecaleback;
     public static final String TAG = "BlueToothService";
 
     @Override
@@ -149,15 +151,15 @@ public class BlueToothMsg extends Service {
                     break;
                 }
                 if (getRevice_date()[5] == getCommand() && checkdata(getRevice_date())) {
-                    Log.d(TAG, "revice_date" + byteArrayToHexString(revice_date));
-                    del_revice_date();
+                    Log.d(TAG, "revice_date=" + byteArrayToHexString(revice_date));
+                    alldatecaleback.onChangeAllDate(revice_date);
                 }
             }
         }
     }
 
     private byte getCommand() {
-        Log.d(TAG, "command=" + command);
+        //Log.d(TAG, "command=" + command);
         return command;
     }
 
@@ -229,6 +231,7 @@ public class BlueToothMsg extends Service {
             buffer[5] = command;
             buffer[6] = (byte) (buffer[2] + buffer[3] + buffer[4] + buffer[5]);
             //callback.onDataChange(String.valueOf(buffer[6]));
+            del_revice_date();
             setCommand(command);
             sendMessageHandle(buffer);
 
@@ -249,6 +252,7 @@ public class BlueToothMsg extends Service {
                 buffer[i + 6] = args[i];
             }
             buffer[6 + args.length] = checksum;
+            del_revice_date();
             setCommand(command);
             sendMessageHandle(buffer);
             //callback.onDataChange(String.valueOf(buffer[6+args.length]));
@@ -265,5 +269,13 @@ public class BlueToothMsg extends Service {
 
     public static interface Callback {
         void onDataChange(String data);
+        void onDataChange(byte[] data);
+    }
+    public void setalldateCallback(AllDateCallback alldatecaleback) {
+        this.alldatecaleback = alldatecaleback;
+    }
+
+    public static interface AllDateCallback {
+        void onChangeAllDate(byte[] data);
     }
 }

@@ -16,7 +16,8 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private Button B_all_user, B_all_date;
-    private BlueToothMsg.MsgBinder myBinder;
+    static BlueToothMsg.MsgBinder myBinder;
+    static byte[] revice_closestool_date = new byte[256];
 
     @Override
     protected void onDestroy() {
@@ -43,6 +44,10 @@ public class MainActivity extends AppCompatActivity {
                     msg.obj = data;
                     handler.sendMessage(msg);
                 }
+                @Override
+                public void onDataChange(byte[] data) {
+                    System.arraycopy(data,0,revice_closestool_date,0,256);
+                }
             });
             myBinder.connectbluetooth();
         }
@@ -51,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
         }
     };
 

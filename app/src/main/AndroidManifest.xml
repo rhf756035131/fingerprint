@@ -25,14 +25,14 @@
 
         <service android:name=".BlueToothMsg"></service>
 
-        <activity android:name=".ReportActivity"></activity>
-        <activity android:name=".FingerprintManageActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".ReportActivity"
+            android:screenOrientation="portrait"></activity>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        <activity
+            android:name=".FingerprintManageActivity"
+            android:screenOrientation="portrait"></activity>
+
     </application>
 
 </manifest>
