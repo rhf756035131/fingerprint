@@ -3,4 +3,10 @@
     <string name="all_user">All user</string>
     <string name="all_data">All data</string>
     <string name="waiting">Waiting...</string>
+    <string name="prompt">Fingerprint Input</string>
+    <string name="again">Again</string>
+    <string name="done">Done</string>
+    <string name="continuation">Continuation</string>
+    <string name="start">start</string>
+    <string name="cancel">cancel</string>
 </resources>
