@@ -216,7 +216,7 @@ public class SearchDeviceActivity extends AppCompatActivity implements AdapterVi
                             BlueToothinfo.lastblueToothAddress=BlueToothinfo.BlueToothAddress;
                         }
 
-                        Intent in=new Intent(SearchDeviceActivity.this,MainActivity.class);
+                        Intent in=new Intent(SearchDeviceActivity.this,LoadActivity.class);
                         startActivity(in);
 
                     }

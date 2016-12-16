@@ -21,18 +21,17 @@
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
-        <service android:name=".BlueToothMsg"></service>
+        <service android:name=".BlueToothMsg" />
 
         <activity
             android:name=".ReportActivity"
-            android:screenOrientation="portrait"></activity>
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".FingerprintManageActivity"
-            android:screenOrientation="portrait"></activity>
-
+            android:screenOrientation="portrait" />
+        <activity android:name=".LoadActivity"></activity>
     </application>
 
 </manifest>

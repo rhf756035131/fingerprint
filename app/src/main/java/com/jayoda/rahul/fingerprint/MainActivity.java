@@ -73,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
         B_all_date =(Button)findViewById(R.id.all_date);
         B_all_user.setOnClickListener(new BClickListener());
         B_all_date.setOnClickListener(new BClickListener());
-        bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
     }
     class BClickListener implements View.OnClickListener {
 
