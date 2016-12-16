@@ -1,12 +1,19 @@
 package com.jayoda.rahul.fingerprint;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
-public class ReportActivity extends PreferenceActivity{
+public class ReportActivity extends PreferenceActivity implements BlueToothMsg.Callback{
 
     private Preference GLUPreference;
     private Preference BILPreference;
@@ -19,16 +26,63 @@ public class ReportActivity extends PreferenceActivity{
     private Preference NITPreference;
     private Preference LEUPreference;
     private Preference VCPreference;
-    private BlueToothMsg myService = MainActivity.myBinder.getService();
+    private BlueToothMsg BTService;
+    private BlueToothMsg.MsgBinder myBinder;
 
-    public  final String TAG = "BlueToothService";
+    public  final String TAG = "Report.BTService";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.layout.activity_report);
         initPreferences();
+        bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
     }
+    private ServiceConnection conn = new ServiceConnection() {
 
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            BTService=null;
+            myBinder=null;
+            Log.d(TAG, "------onServiceDisconnected---------");
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d(TAG, "------onServiceConnected---------");
+            myBinder = (BlueToothMsg.MsgBinder) service;
+            BTService = myBinder.getService();
+            Log.d(TAG, "ReportActivity BTService="+BTService.toString());
+            BTService.setCallback(ReportActivity.this);
+            myBinder.sendCommand(BT_command.cmd_read_single_date);
+        }
+    };
+    @Override
+    public void onDataChange(String data) {
+        Message msg = new Message();
+        msg.obj = data;
+        handler.sendMessage(msg);
+    }
+    @Override
+    public void onDataChange(byte[] buf_data) {
+        set_textview_GLU_R((buf_data[16] >> 1) & 0x07);
+        set_textview_TV_BIL_R(((buf_data[16] << 2) & 0x04) | ((buf_data[17] >> 6) & 0x03));
+        set_textview_TV_KET_R((buf_data[17] >> 3) & 0x07);
+        set_textview_TV_BLD_R((buf_data[14] >> 4) & 0x07);
+        set_textview_TV_RPO_R(((buf_data[14] << 2) & 0x04) | ((buf_data[15] >> 6) & 0x03));
+        set_textview_TV_URO_R((buf_data[15] >> 3) & 0x07);
+        set_textview_TV_NIT_R(buf_data[15] & 0x07);
+        set_textview_TV_VC_R(buf_data[16] >> 4 & 0x07);
+        set_textview_TV_LEU_R((buf_data[12] >> 3) & 0x07);
+        set_textview_TV_PH_R((buf_data[14] >> 1) & 0x07);
+        set_textview_TV_SG_R(buf_data[17] & 0x07);
+    }
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            Toast.makeText(ReportActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+        }
+    };
     final protected static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     public String byteArrayToHexString(byte[] bytes) {
@@ -64,6 +118,8 @@ public class ReportActivity extends PreferenceActivity{
 
     @Override
     protected void onDestroy() {
+        unbindService(conn);
+        Log.d(TAG, "unbindService");
         super.onDestroy();
     }
 
@@ -74,24 +130,6 @@ public class ReportActivity extends PreferenceActivity{
 
     @Override
     protected void onStart() {
-        MainActivity.myBinder.sendCommand(BT_command.cmd_read_single_date);
-        myService.setalldateCallback(new BlueToothMsg.AllDateCallback() {
-                                         @Override
-                                         public void onChangeAllDate(byte[] buf_data) {
-                                             set_textview_GLU_R((buf_data[16] >> 1) & 0x07);
-                                             set_textview_TV_BIL_R(((buf_data[16] << 2) & 0x04) | ((buf_data[17] >> 6) & 0x03));
-                                             set_textview_TV_KET_R((buf_data[17] >> 3) & 0x07);
-                                             set_textview_TV_BLD_R((buf_data[14] >> 4) & 0x07);
-                                             set_textview_TV_RPO_R(((buf_data[14] << 2) & 0x04) | ((buf_data[15] >> 6) & 0x03));
-                                             set_textview_TV_URO_R((buf_data[15] >> 3) & 0x07);
-                                             set_textview_TV_NIT_R(buf_data[15] & 0x07);
-                                             set_textview_TV_VC_R(buf_data[16] >> 4 & 0x07);
-                                             set_textview_TV_LEU_R((buf_data[12] >> 3) & 0x07);
-                                             set_textview_TV_PH_R((buf_data[14] >> 1) & 0x07);
-                                             set_textview_TV_SG_R(buf_data[17] & 0x07);
-                                         }
-                                     }
-        );
         super.onStart();
     }
 

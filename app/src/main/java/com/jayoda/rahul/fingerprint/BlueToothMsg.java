@@ -37,8 +37,7 @@ public class BlueToothMsg extends Service {
 
     private MsgBinder m_Binder = new MsgBinder();
     private Callback callback;
-    private AllDateCallback alldatecaleback;
-    public static final String TAG = "BlueToothService";
+    private final String TAG = "BTService";
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -152,7 +151,7 @@ public class BlueToothMsg extends Service {
                 }
                 if (getRevice_date()[5] == getCommand() && checkdata(getRevice_date())) {
                     Log.d(TAG, "revice_date=" + byteArrayToHexString(revice_date));
-                    alldatecaleback.onChangeAllDate(revice_date);
+                    callback.onDataChange(revice_date);
                 }
             }
         }
@@ -209,13 +208,12 @@ public class BlueToothMsg extends Service {
     }
 
     public class MsgBinder extends Binder {
-        public void connectbluetooth() {
+        public void ConnectBluetooth() {
             String address = BlueToothinfo.BlueToothAddress;
             if (!address.equals("null")) {
                 device = mBluetoothAdapter.getRemoteDevice(address);
                 clientConnectThread = new clientThread();
                 clientConnectThread.start();
-                BlueToothinfo.isOpen = true;
             } else {
                 callback.onDataChange("address is null");
             }
@@ -267,15 +265,8 @@ public class BlueToothMsg extends Service {
         this.callback = callback;
     }
 
-    public static interface Callback {
+    public interface Callback {
         void onDataChange(String data);
         void onDataChange(byte[] data);
-    }
-    public void setalldateCallback(AllDateCallback alldatecaleback) {
-        this.alldatecaleback = alldatecaleback;
-    }
-
-    public static interface AllDateCallback {
-        void onChangeAllDate(byte[] data);
     }
 }

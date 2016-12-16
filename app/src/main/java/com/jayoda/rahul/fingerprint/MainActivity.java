@@ -13,45 +13,49 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements BlueToothMsg.Callback{
 
     private Button B_all_user, B_all_date;
-    static BlueToothMsg.MsgBinder myBinder;
-    static byte[] revice_closestool_date = new byte[256];
+    private BlueToothMsg BTService;
+    private BlueToothMsg.MsgBinder myBinder;
+    private final String TAG = "Main.BTService";
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         unbindService(conn);
+        Log.d(TAG, "unbindService");
     }
 
     private ServiceConnection conn = new ServiceConnection() {
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            //Log.d(BlueToothMsg.TAG, "------onServiceDisconnected---------");
+            BTService = null;
+            Log.d(TAG, "------onServiceDisconnected---------");
         }
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(BlueToothMsg.TAG, "------onServiceConnected---------");
+            Log.d(TAG, "------onServiceConnected---------");
             myBinder = (BlueToothMsg.MsgBinder) service;
-            BlueToothMsg myService = myBinder.getService();
-            myService.setCallback(new BlueToothMsg.Callback() {
-                @Override
-                public void onDataChange(String data) {
-                    Message msg = new Message();
-                    msg.obj = data;
-                    handler.sendMessage(msg);
-                }
-                @Override
-                public void onDataChange(byte[] data) {
-                    System.arraycopy(data,0,revice_closestool_date,0,256);
-                }
-            });
-            myBinder.connectbluetooth();
+            BTService = myBinder.getService();
+            Log.d(TAG, "MainActivity BTService="+BTService.toString());
+            BTService.setCallback(MainActivity.this);
+            myBinder.ConnectBluetooth();
+
         }
     };
+    @Override
+    public void onDataChange(String data) {
+        Message msg = new Message();
+        msg.obj = data;
+        handler.sendMessage(msg);
+    }
+    @Override
+    public void onDataChange(byte[] data) {
+        Log.d(TAG, "------received---------");
+    }
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
