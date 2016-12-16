@@ -2,11 +2,16 @@
     <string name="app_name">Fingerprint</string>
     <string name="all_user">All user</string>
     <string name="all_data">All data</string>
-    <string name="waiting">Waiting...</string>
+    <string name="waiting">Waiting ...</string>
+    <string name="fingerprint_progress">Fingerprint Input(%1$d/%2$d):</string>
     <string name="prompt">Fingerprint Input</string>
+    <string name="press_finger">Please press your finger</string>
+    <string name="release_finger">Please release your finger</string>
+    <string name="success">Success</string>
+    <string name="fail">Fail</string>
     <string name="again">Again</string>
     <string name="done">Done</string>
     <string name="continuation">Continuation</string>
     <string name="start">start</string>
-    <string name="cancel">cancel</string>
+    <string name="cancel">Cancel</string>
 </resources>

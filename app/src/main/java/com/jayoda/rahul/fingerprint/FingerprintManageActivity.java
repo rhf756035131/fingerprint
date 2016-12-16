@@ -30,21 +30,27 @@ public class FingerprintManageActivity extends AppCompatActivity {
         Scan_right = (Button) findViewById(R.id.scan_right);
         Scan_right.setOnClickListener(new BClickListener());
 
+        Scan_prompt=(TextView)findViewById(R.id.prompt_scan);
         myService.setalldateCallback(new BlueToothMsg.AllDateCallback() {
             @Override
             public void onChangeAllDate(byte[] data) {
                 switch (data[5]) {
                     case BT_command.cmd_collect_finger://终端返回采集图像命令
                         if (data[6] == 0x00) {
+                            Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                    + getResources().getString(R.string.release_finger));
                             //把检查到的指纹生成特征，保存到ramBuffer中
-                            MainActivity.myBinder.sendCommand(BT_command.cmd_fingerTemp_push_ram);
+                            byte[] buffer=new byte[]{(byte)count};
+                            MainActivity.myBinder.sendCommand(BT_command.cmd_fingerTemp_push_ram,buffer);
                         }else{
                             if(InputFingerPrintCount<InputFingerPrintCountMax){
                                 InputFingerPrintCount++;
                                 MainActivity.myBinder.sendCommand(BT_command.cmd_collect_finger);
                             }else{
+                                Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                        + getResources().getString(R.string.fail));
                                 Scan_left.setEnabled(true);
-                                Scan_right.setEnabled(true);
+                                Scan_right.setEnabled(false);
                             }
                         }
                         break;
@@ -56,14 +62,18 @@ public class FingerprintManageActivity extends AppCompatActivity {
                                 MainActivity.myBinder.sendCommand(BT_command.cmd_fingerTemp_merge);
                             }
                         }else {
+                            Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                    + getResources().getString(R.string.fail));
                             Scan_left.setEnabled(true);
-                            Scan_right.setEnabled(true);
+                            Scan_right.setEnabled(false);
                         }
                         break;
                     case BT_command.cmd_fingerTemp_merge:
                         Scan_left.setEnabled(true);
                         Scan_right.setEnabled(true);
                         if (data[6] == 0x00) {
+                            Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                    + getResources().getString(R.string.success));
                             if(count<maxCount){
                                 Scan_left.setText(R.string.again);
                                 Scan_right.setText(R.string.continuation);
@@ -72,6 +82,8 @@ public class FingerprintManageActivity extends AppCompatActivity {
                                 Scan_right.setText(R.string.done);
                             }
                         }else{
+                            Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                    + getResources().getString(R.string.fail));
                             count--;
                         }
                         break;
@@ -106,9 +118,12 @@ public class FingerprintManageActivity extends AppCompatActivity {
                 case R.id.scan_left:
                     if(getResources().getString(R.string.cancel).equals(ButtonText)){
                         finish();
-                    }else{
+                    } else {
                         count--;
                         MainActivity.myBinder.sendCommand(BT_command.cmd_collect_finger);
+                        Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                + getResources().getString(R.string.press_finger));
+                        InputFingerPrintCount = 0;
                         Scan_left.setEnabled(false);
                         Scan_right.setEnabled(false);
                     }
@@ -118,6 +133,9 @@ public class FingerprintManageActivity extends AppCompatActivity {
                         finish();
                     }else{
                         MainActivity.myBinder.sendCommand(BT_command.cmd_collect_finger);
+                        Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                + getResources().getString(R.string.press_finger));
+                        InputFingerPrintCount=0;
                         Scan_left.setEnabled(false);
                         Scan_right.setEnabled(false);
                     }
