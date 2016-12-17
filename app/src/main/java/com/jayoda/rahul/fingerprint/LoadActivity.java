@@ -9,6 +9,7 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,8 @@ public class LoadActivity extends AppCompatActivity implements BlueToothMsg.Call
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_load);
         LoadText=(TextView)findViewById(R.id.LoadText);
         bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
@@ -29,7 +32,8 @@ public class LoadActivity extends AppCompatActivity implements BlueToothMsg.Call
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            BTService = null;
+            BTService=null;
+            myBinder=null;
             Log.d(TAG, "------onServiceDisconnected---------");
         }
 
@@ -62,19 +66,21 @@ public class LoadActivity extends AppCompatActivity implements BlueToothMsg.Call
     public void onDataChange(byte[] data) {
         Log.d(TAG, "------received---------");
     }
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if("已经连接上马桶！可以发送命令。".equals(msg.obj.toString())){
-                Intent MainIn=new Intent(LoadActivity.this,MainActivity.class);
+            if ("已经连接上马桶！可以发送命令。".equals(msg.obj.toString())) {
+                LoadText.setText(R.string.success);
+            } else if ("连接马桶异常！断开连接重新试一试。".equals(msg.obj.toString())) {
+                Intent MainIn = new Intent(LoadActivity.this, MainActivity.class);
                 startActivity(MainIn);
-            }else if("连接马桶异常！断开连接重新试一试。".equals(msg.obj.toString())) {
+                finish();
                 LoadText.setText(R.string.fail);
-            }else{
-                    Toast.makeText(LoadActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
-                }
             }
+            Toast.makeText(LoadActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+        }
     };
 
 }

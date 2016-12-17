@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-            BTService = null;
+            BTService=null;
+            myBinder=null;
             Log.d(TAG, "------onServiceDisconnected---------");
         }
 
@@ -42,8 +43,6 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
             BTService = myBinder.getService();
             Log.d(TAG, "MainActivity BTService="+BTService.toString());
             BTService.setCallback(MainActivity.this);
-            myBinder.ConnectBluetooth();
-
         }
     };
     @Override
@@ -69,6 +68,7 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
         B_all_user =(Button)findViewById(R.id.user_manage);
         B_all_date =(Button)findViewById(R.id.all_date);
         B_all_user.setOnClickListener(new BClickListener());
