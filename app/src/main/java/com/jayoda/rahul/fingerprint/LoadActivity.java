@@ -72,6 +72,9 @@ public class LoadActivity extends AppCompatActivity implements BlueToothMsg.Call
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if ("已经连接上马桶！可以发送命令。".equals(msg.obj.toString())) {
+                Intent MainIn = new Intent(LoadActivity.this, MainActivity.class);
+                startActivity(MainIn);
+                finish();
                 LoadText.setText(R.string.success);
             } else if ("连接马桶异常！断开连接重新试一试。".equals(msg.obj.toString())) {
                 Intent MainIn = new Intent(LoadActivity.this, MainActivity.class);

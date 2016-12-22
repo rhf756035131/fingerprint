@@ -27,6 +27,7 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
     private ImageView Scanning_anim;
     private Button Scan_left, Scan_right;
     private TextView Scan_prompt;
+    private  final int ChangeUI=2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,23 +67,27 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
     }
     @Override
     public void onDataChange(byte[] data) {
+        HandlerMassage mHandlerMassage=new HandlerMassage();
         switch (data[5]) {
             case BT_command.cmd_collect_finger://终端返回采集图像命令
                 if (data[6] == 0x00) {
-                    Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
-                            + getResources().getString(R.string.release_finger));
+                    mHandlerMassage.pomprtText=String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                            + getResources().getString(R.string.release_finger);
                     //把检查到的指纹生成特征，保存到ramBuffer中
                     byte[] buffer=new byte[]{(byte)count};
                     myBinder.sendCommand(BT_command.cmd_fingerTemp_push_ram,buffer);
+                    Log.d(TAG, "采集到指纹 count="+count);
                 }else{
                     if(InputFingerPrintCount<InputFingerPrintCountMax){
                         InputFingerPrintCount++;
                         myBinder.sendCommand(BT_command.cmd_collect_finger);
                     }else{
-                        Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
-                                + getResources().getString(R.string.fail));
-                        Scan_left.setEnabled(true);
-                        Scan_right.setEnabled(false);
+                        mHandlerMassage.pomprtText=String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                                + getResources().getString(R.string.fail);
+                        mHandlerMassage.leftEanble=1;
+                        mHandlerMassage.rightEnable=-1;
+                        //Scan_left.setEnabled(true);
+                        //Scan_right.setEnabled(false);
                     }
                 }
                 break;
@@ -94,41 +99,82 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                         myBinder.sendCommand(BT_command.cmd_fingerTemp_merge);
                     }
                 }else {
-                    Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
-                            + getResources().getString(R.string.fail));
-                    Scan_left.setEnabled(true);
-                    Scan_right.setEnabled(false);
+                    mHandlerMassage.pomprtText=String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                            + getResources().getString(R.string.fail);
+                    mHandlerMassage.leftEanble=1;
+                    mHandlerMassage.rightEnable=-1;
+                    //Scan_left.setEnabled(true);
+                    //Scan_right.setEnabled(false);
                 }
                 break;
             case BT_command.cmd_fingerTemp_merge:
-                Scan_left.setEnabled(true);
-                Scan_right.setEnabled(true);
+                mHandlerMassage.leftEanble=1;
+                mHandlerMassage.rightEnable=1;
+                //Scan_left.setEnabled(true);
+                //Scan_right.setEnabled(true);
                 if (data[6] == 0x00) {
-                    Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
-                            + getResources().getString(R.string.success));
+                    mHandlerMassage.pomprtText=String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                            + getResources().getString(R.string.success);
                     if(count<maxCount){
-                        Scan_left.setText(R.string.again);
-                        Scan_right.setText(R.string.continuation);
+                        mHandlerMassage.leftText=getResources().getString(R.string.again);
+                        mHandlerMassage.rightText=getResources().getString(R.string.continuation);
+                        //Scan_left.setText(R.string.again);
+                       // Scan_right.setText(R.string.continuation);
                     }else {
-                        Scan_left.setEnabled(false);
-                        Scan_right.setText(R.string.done);
+                        mHandlerMassage.leftEanble=-1;
+                        mHandlerMassage.rightText=getResources().getString(R.string.done);
+                        //Scan_left.setEnabled(false);
+                        //Scan_right.setText(R.string.done);
                     }
                 }else{
-                    Scan_prompt.setText(String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
-                            + getResources().getString(R.string.fail));
+                    mHandlerMassage.pomprtText=String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
+                            + getResources().getString(R.string.fail);
                     count--;
                 }
                 break;
             default:
                 break;
         }
-
+        Message msg = new Message();
+        msg.what=ChangeUI;
+        msg.obj = mHandlerMassage;
+        handler.sendMessage(msg);
     }
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            Toast.makeText(FingerprintManageActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+            switch (msg.what){
+                case ChangeUI:
+                    HandlerMassage catchHandlerMassage = (HandlerMassage) msg.obj;
+                    if (!"null".equals(catchHandlerMassage.pomprtText)) {
+                        Scan_prompt.setText(catchHandlerMassage.pomprtText);
+                    }
+                    if (!"null".equals(catchHandlerMassage.leftText)) {
+                        Scan_left.setText(catchHandlerMassage.leftText);
+                    }
+                    if (!"null".equals(catchHandlerMassage.rightText)) {
+                        Scan_right.setText(catchHandlerMassage.rightText);
+                    }
+                    if(-1==catchHandlerMassage.leftEanble){
+                        Scan_left.setEnabled(false);
+                    }
+                    if(1==catchHandlerMassage.leftEanble){
+                        Scan_left.setEnabled(true);
+                    }
+                    if(-1==catchHandlerMassage.rightEnable){
+                        Scan_right.setEnabled(false);
+                    }
+                    if(1==catchHandlerMassage.rightEnable){
+                        Scan_right.setEnabled(true);
+                    }
+                    break;
+                default:
+                    Toast.makeText(FingerprintManageActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+                    break;
+            }
+
         }
     };
     @Override
@@ -183,5 +229,12 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                     break;
             }
         }
+    }
+    class HandlerMassage{
+       public String  pomprtText="null";
+        public String leftText="null";
+        public String rightText="null";
+        public int rightEnable=0;
+        public int leftEanble=0;
     }
 }
