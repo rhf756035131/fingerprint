@@ -22,6 +22,7 @@ public class BT_command {
     public static final  byte cmd_collect_finger=0x20;
     public static final  byte cmd_fingerTemp_push_datebase=0x40;
     public static final  byte cmd_del_finger=0x44;
+    public static final  byte cmd_get_ID=0x45;
     public static final  byte cmd_fingerTemp_push_ram=0x60;
     public static final  byte cmd_fingerTemp_merge=0x61;
 }

@@ -10,26 +10,4 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.jayoda.rahul.fingerprint.MainActivity">
 
-    <LinearLayout
-        android:id="@+id/bottom_buttons"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/user_manage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/all_user" >
-        </Button>
-
-        <Button
-            android:id="@+id/all_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/all_data" >
-        </Button>
-
-    </LinearLayout>
-
 </RelativeLayout>

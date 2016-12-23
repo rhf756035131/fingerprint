@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Fingerprint</string>
+    <string name="app_name">I-Stool</string>
     <string name="all_user">指纹采集</string>
     <string name="all_data">所有数据</string>
     <string name="prompt">指纹录入</string>
+    <string name="waiting">请等待</string>
     <string name="fingerprint_progress">指纹录入(%1$d/%2$d):</string>
     <string name="press_finger">请按下手指</string>
     <string name="release_finger">请松开手指</string>

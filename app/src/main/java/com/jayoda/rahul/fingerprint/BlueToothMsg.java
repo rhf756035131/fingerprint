@@ -240,7 +240,7 @@ public class BlueToothMsg extends Service {
             byte checksum = 0;
             buffer[0] = BT_command.header[0];
             buffer[1] = BT_command.header[1];
-            buffer[2] = (byte) (args.length + 3);
+            buffer[2] = (byte) (args.length + 4);
             buffer[3] = BT_command.machine_code[0];
             buffer[4] = BT_command.machine_code[1];
             buffer[5] = command;

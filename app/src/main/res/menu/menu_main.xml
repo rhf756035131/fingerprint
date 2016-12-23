@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_user"
+        android:orderInCategory="100"
+        android:title="@string/all_user"
+        android:icon="@android:drawable/ic_menu_crop"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_data"
+        android:orderInCategory="100"
+        android:title="@string/all_data"
+        android:icon="@android:drawable/ic_menu_info_details"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_del"
+        android:orderInCategory="100"
+        android:title="清除所有指纹"
+        android:icon="@android:drawable/ic_menu_delete"
+        app:showAsAction="never" />
+</menu>
