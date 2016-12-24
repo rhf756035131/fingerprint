@@ -53,15 +53,35 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
         msg.obj = data;
         handler.sendMessage(msg);
     }
+
     @Override
     public void onDataChange(byte[] data) {
         Log.d(TAG, "------received---------");
+        Message msg = new Message();
+        switch (data[5]) {
+            case BT_command.cmd_del_finger:
+                if (data[6] == 0x00) {
+                    Log.d(TAG, "删除指纹成功");
+                    msg.obj = "成功删除指纹";
+                }else {
+                    Log.d(TAG, "删除指纹失败");
+                    msg.obj = "删除指纹失败";
+                }
+                break;
+            default:
+                Log.d(TAG, "指令错误");
+
+                break;
+        }
+        handler.sendMessage(msg);
     }
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            Log.d(TAG, "接收到handleMessage");
+            Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
             super.handleMessage(msg);
-                Toast.makeText(MainActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+
         }
     };
 
@@ -84,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
                 startActivity(ReportIn);
                 break;
             case R.id.action_del:
+                myBinder.sendCommand(BT_command.cmd_del_finger);
             default:
                 break;
         }

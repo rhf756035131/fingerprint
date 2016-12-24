@@ -149,9 +149,12 @@ public class BlueToothMsg extends Service {
                     }
                     break;
                 }
-                if (getRevice_date()[5] == getCommand() && checkdata(getRevice_date())) {
-                    Log.d(TAG, "revice_date=" + byteArrayToHexString(revice_date));
+                Log.d(TAG, "接收数据叠加=" + byteArrayToHexString(revice_date));
+                if ((getRevice_date()[5] == 0x45|| getRevice_date()[5] == 0x46||getRevice_date()[5] == 0x63||checkdata(getRevice_date()))&&(getRevice_date()[5] != 0x00)) {
+                    Log.d(TAG, "接收数据完成=" + byteArrayToHexString(revice_date));
                     callback.onDataChange(revice_date);
+                    Log.d(TAG, "清空数据");
+                    del_revice_date();
                 }
             }
         }
@@ -231,6 +234,7 @@ public class BlueToothMsg extends Service {
             //callback.onDataChange(String.valueOf(buffer[6]));
             del_revice_date();
             setCommand(command);
+            Log.d(TAG, "发送指令=" + byteArrayToHexString(buffer));
             sendMessageHandle(buffer);
 
         }
@@ -253,6 +257,7 @@ public class BlueToothMsg extends Service {
             del_revice_date();
             setCommand(command);
             sendMessageHandle(buffer);
+            Log.d(TAG, "发送指令=" + byteArrayToHexString(buffer));
             //callback.onDataChange(String.valueOf(buffer[6+args.length]));
         }
 

@@ -35,6 +35,8 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
     private final int ChangeUI = 2;
     private final int GetIDSuccess = 3;
     private final int GetIDFail = 4;
+    private final int CheckIDFail = 5;
+    private final int CheckIDSuccess = 6;
     private String username;
     private ProgressDialog proDia;
 
@@ -171,11 +173,26 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                 break;
             case BT_command.cmd_get_ID:
                 if (data[6] == 0x00) {
+                    Log.d(TAG, "获取ｉｄ失败");
                     msg.what = GetIDFail;
                 } else {
+                    Log.d(TAG, "获取ｉｄ成功");
+                    byte[] FingerID=new byte[2];
+                    FingerID[0]=data[6];
+                    FingerID[1]=data[7];
+                    myBinder.sendCommand(BT_command.cmd_check_ID, FingerID);
                     msg.what = GetIDSuccess;
                 }
                 break;
+            case BT_command.cmd_check_ID:
+                if (data[6] == 0x01) {
+                    Log.d(TAG, "注册ｉｄ失败");
+                    msg.what = CheckIDFail;
+                }else if (data[6] == 0x00){
+                    Log.d(TAG, "注册ｉｄ成功");
+                    msg.what = CheckIDSuccess;
+                }
+                    break;
             default:
                 break;
         }
@@ -212,6 +229,30 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                     }
                     break;
                 case GetIDSuccess:
+                    break;
+                case GetIDFail:
+                    new AlertDialog.Builder(FingerprintManageActivity.this).setTitle("获取ID失败").setIcon(
+                            android.R.drawable.ic_dialog_info).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            //退出指纹录入
+                            finish();
+                        }
+                    }).show();
+                    proDia.dismiss();
+                    break;
+                case CheckIDFail:
+                    new AlertDialog.Builder(FingerprintManageActivity.this).setTitle("ID已经被注册").setIcon(
+                            android.R.drawable.ic_dialog_info).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            //退出指纹录入
+                            finish();
+                        }
+                    }).show();
+                    proDia.dismiss();
+                    break;
+                case CheckIDSuccess:
                     final EditText et = new EditText(FingerprintManageActivity.this);
                     new AlertDialog.Builder(FingerprintManageActivity.this).setTitle("请输入名字").setIcon(
                             android.R.drawable.ic_dialog_info).setView(et).setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -220,15 +261,9 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                             //获取名字
                             username = et.getText().toString().trim();
                         }
-                    }).setNegativeButton("取消", null).show();
-                    proDia.dismiss();
-                    break;
-                case GetIDFail:
-                    new AlertDialog.Builder(FingerprintManageActivity.this).setTitle("获取ID失败").setIcon(
-                            android.R.drawable.ic_dialog_info).setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                    }).setNegativeButton("取消", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface arg0, int arg1) {
-                            //退出指纹录入
                             finish();
                         }
                     }).show();
