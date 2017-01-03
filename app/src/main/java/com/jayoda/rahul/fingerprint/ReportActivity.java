@@ -30,6 +30,7 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
     private BlueToothMsg.MsgBinder myBinder;
 
     public  final String TAG = "Report.BTService";
+    private final int ChangeToPreference = 2;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,23 +65,35 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
     }
     @Override
     public void onDataChange(byte[] buf_data) {
-        set_textview_GLU_R((buf_data[16] >> 1) & 0x07);
-        set_textview_TV_BIL_R(((buf_data[16] << 2) & 0x04) | ((buf_data[17] >> 6) & 0x03));
-        set_textview_TV_KET_R((buf_data[17] >> 3) & 0x07);
-        set_textview_TV_BLD_R((buf_data[14] >> 4) & 0x07);
-        set_textview_TV_RPO_R(((buf_data[14] << 2) & 0x04) | ((buf_data[15] >> 6) & 0x03));
-        set_textview_TV_URO_R((buf_data[15] >> 3) & 0x07);
-        set_textview_TV_NIT_R(buf_data[15] & 0x07);
-        set_textview_TV_VC_R(buf_data[16] >> 4 & 0x07);
-        set_textview_TV_LEU_R((buf_data[12] >> 3) & 0x07);
-        set_textview_TV_PH_R((buf_data[14] >> 1) & 0x07);
-        set_textview_TV_SG_R(buf_data[17] & 0x07);
+        Message msg = new Message();
+        msg.obj = buf_data;
+        msg.what=ChangeToPreference;
+        handler.sendMessage(msg);
     }
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            byte[] buf_data;
             super.handleMessage(msg);
-            Toast.makeText(ReportActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+            switch (msg.what){
+                case ChangeToPreference:
+                    buf_data =(byte[])msg.obj;
+                    set_textview_GLU_R((buf_data[16] >> 1) & 0x07);
+                    set_textview_TV_BIL_R(((buf_data[16] << 2) & 0x04) | ((buf_data[17] >> 6) & 0x03));
+                    set_textview_TV_KET_R((buf_data[17] >> 3) & 0x07);
+                    set_textview_TV_BLD_R((buf_data[14] >> 4) & 0x07);
+                    set_textview_TV_RPO_R(((buf_data[14] << 2) & 0x04) | ((buf_data[15] >> 6) & 0x03));
+                    set_textview_TV_URO_R((buf_data[15] >> 3) & 0x07);
+                    set_textview_TV_NIT_R(buf_data[15] & 0x07);
+                    set_textview_TV_VC_R(buf_data[16] >> 4 & 0x07);
+                    set_textview_TV_LEU_R((buf_data[12] >> 3) & 0x07);
+                    set_textview_TV_PH_R((buf_data[14] >> 1) & 0x07);
+                    set_textview_TV_SG_R(buf_data[17] & 0x07);
+                    break;
+                default:
+                    Toast.makeText(ReportActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
+            }
+
         }
     };
     final protected static char[] hexArray = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};

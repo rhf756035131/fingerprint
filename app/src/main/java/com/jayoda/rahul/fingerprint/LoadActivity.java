@@ -27,6 +27,7 @@ public class LoadActivity extends AppCompatActivity implements BlueToothMsg.Call
         setContentView(R.layout.activity_load);
         LoadText=(TextView)findViewById(R.id.LoadText);
         bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
+        LogcatHelper.getInstance(this).start();
     }
     private ServiceConnection conn = new ServiceConnection() {
 

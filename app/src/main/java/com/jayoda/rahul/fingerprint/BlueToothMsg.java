@@ -150,7 +150,7 @@ public class BlueToothMsg extends Service {
                     break;
                 }
                 Log.d(TAG, "接收数据叠加=" + byteArrayToHexString(revice_date));
-                if ((getRevice_date()[5] == 0x45|| getRevice_date()[5] == 0x46||getRevice_date()[5] == 0x63||checkdata(getRevice_date()))&&(getRevice_date()[5] != 0x00)) {
+                if (checkHead(getRevice_date())&&checkdata(getRevice_date())) {
                     Log.d(TAG, "接收数据完成=" + byteArrayToHexString(revice_date));
                     callback.onDataChange(revice_date);
                     Log.d(TAG, "清空数据");
@@ -203,13 +203,18 @@ public class BlueToothMsg extends Service {
 
     private boolean checkdata(byte[] buf_data) {
         int mun = 0;
-        int i = 0;
+        int i ;
         for (i = 2; i < (int) buf_data[2] + 2; i++) {
             mun = mun + buf_data[i] & 0xff;
         }
         return ((byte) mun == buf_data[buf_data[2] + 2]);
     }
-
+    private boolean checkHead(byte[] buf_data) {
+        if((BT_command.header[0]==buf_data[0])&&(BT_command.header[1]==buf_data[1])&&(buf_data[2]!=0)){
+            return true;
+        }
+        return false;
+    }
     public class MsgBinder extends Binder {
         public void ConnectBluetooth() {
             String address = BlueToothinfo.BlueToothAddress;

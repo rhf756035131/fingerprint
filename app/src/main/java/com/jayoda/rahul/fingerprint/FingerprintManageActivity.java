@@ -177,9 +177,8 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                     msg.what = GetIDFail;
                 } else {
                     Log.d(TAG, "获取ｉｄ成功");
-                    byte[] FingerID=new byte[2];
-                    FingerID[0]=data[6];
-                    FingerID[1]=data[7];
+                    byte[] FingerID=new byte[0];
+                    FingerID[0]=data[7];
                     myBinder.sendCommand(BT_command.cmd_check_ID, FingerID);
                     msg.what = GetIDSuccess;
                 }
