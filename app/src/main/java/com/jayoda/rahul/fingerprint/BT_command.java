@@ -18,7 +18,7 @@ public class BT_command {
     public static final  byte cmd_close_bt=0x09;
     public static final  byte cmd_rename_bt=0x0a;
     public static final  byte cmd_auto_test=0x0B;
-    // public static final  byte cmd_auto_test=0x0B;
+    public static final  byte cmd_finger_input_done=0x0f;
     public static final  byte cmd_collect_finger=0x20;
     public static final  byte cmd_fingerTemp_push_datebase=0x40;
     public static final  byte cmd_del_finger=0x44;

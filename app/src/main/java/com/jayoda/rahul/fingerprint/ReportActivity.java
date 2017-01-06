@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.Arrays;
+
 public class ReportActivity extends PreferenceActivity implements BlueToothMsg.Callback{
 
     private Preference GLUPreference;
@@ -26,7 +28,9 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
     private Preference NITPreference;
     private Preference LEUPreference;
     private Preference VCPreference;
+    private Preference TimePreference;
     private BlueToothMsg BTService;
+    private byte[] save_data=new byte[256];
     private BlueToothMsg.MsgBinder myBinder;
 
     public  final String TAG = "Report.BTService";
@@ -66,7 +70,12 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
     @Override
     public void onDataChange(byte[] buf_data) {
         Message msg = new Message();
-        msg.obj = buf_data;
+        int dex=0;
+        Arrays.fill(save_data, (byte) 0);
+        for(byte m:buf_data) {
+            save_data[dex++] = m;
+        }
+        msg.obj = save_data;
         msg.what=ChangeToPreference;
         handler.sendMessage(msg);
     }
@@ -78,6 +87,7 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
             switch (msg.what){
                 case ChangeToPreference:
                     buf_data =(byte[])msg.obj;
+                    Log.d(TAG, "handler 接收到数据="+byteArrayToHexString(buf_data));
                     set_textview_GLU_R((buf_data[16] >> 1) & 0x07);
                     set_textview_TV_BIL_R(((buf_data[16] << 2) & 0x04) | ((buf_data[17] >> 6) & 0x03));
                     set_textview_TV_KET_R((buf_data[17] >> 3) & 0x07);
@@ -89,6 +99,7 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
                     set_textview_TV_LEU_R((buf_data[12] >> 3) & 0x07);
                     set_textview_TV_PH_R((buf_data[14] >> 1) & 0x07);
                     set_textview_TV_SG_R(buf_data[17] & 0x07);
+                    set_time(buf_data);
                     break;
                 default:
                     Toast.makeText(ReportActivity.this, msg.obj.toString(), Toast.LENGTH_SHORT).show();
@@ -122,6 +133,7 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
         NITPreference = (Preference)findPreference("NIT");
         LEUPreference = (Preference)findPreference("LEU");
         VCPreference = (Preference)findPreference("VC");
+        TimePreference= (Preference)findPreference("time");
     }
 
     @Override
@@ -420,5 +432,12 @@ public class ReportActivity extends PreferenceActivity implements BlueToothMsg.C
                 VCPreference.setSummary("error");
                 break;
         }
+    }
+    private void set_time(byte[] buffdata)
+    {
+        byteArrayToHexString(buffdata);
+        String times = Integer.toString((buffdata[11]) & 0x7f) + "/" + Integer.toString(((buffdata[11] >> 7) & 0x1) | ((buffdata[10]) & 0x07)) +
+                "/" + Integer.toString((buffdata[10]>>3)&0x1f) + " " + Integer.toString(buffdata[13]&0x1f) + ":" + Integer.toString(((buffdata[12]<<3)&0x07)|((buffdata[13]>>5)&0x07));
+        TimePreference.setSummary(times);
     }
 }

@@ -54,4 +54,8 @@
         android:title="抗坏血酸"
         android:summary="@string/waiting"
         android:persistent="false" />
+    <Preference android:key="time"
+        android:title="时间"
+        android:summary="@string/waiting"
+        android:persistent="false" />
 </PreferenceScreen>

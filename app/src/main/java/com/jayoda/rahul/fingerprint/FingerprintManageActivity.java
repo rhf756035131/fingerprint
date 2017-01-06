@@ -39,6 +39,7 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
     private final int CheckIDSuccess = 6;
     private String username;
     private ProgressDialog proDia;
+    private byte[] FingerID=new byte[1];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +54,10 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
 
         Scan_prompt = (TextView) findViewById(R.id.prompt_scan);
         bindService(new Intent(this, BlueToothMsg.class), conn, BIND_AUTO_CREATE);
-        // proDia.setTitle("搜索网络");
-        proDia=new ProgressDialog(FingerprintManageActivity.this);
-        proDia.setMessage("请等待....");
-        proDia.show();
+         //proDia.setTitle("搜索网络");
+        proDia=ProgressDialog.show(this, "获取ID", "请等待....");
+       // proDia.setMessage("请等待....");
+      //  proDia.show();
     }
 
     private ServiceConnection conn = new ServiceConnection() {
@@ -141,8 +142,10 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                 break;
             case BT_command.cmd_fingerTemp_merge:
                 if (data[6] == 0x00) {
+                    Log.d(TAG, "merge 指纹成功");
                     myBinder.sendCommand(BT_command.cmd_fingerTemp_push_datebase);
                 } else {
+                    Log.d(TAG, "merge 指纹失败");
                     mHandlerMassage.pomprtText = String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
                             + getResources().getString(R.string.fail);
                     count--;
@@ -154,9 +157,10 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                 mHandlerMassage.leftEnable = 1;
                 mHandlerMassage.rightEnable = 1;
                 if (data[6] == 0x02) {
+                    Log.d(TAG, "保存 指纹成功");
                     mHandlerMassage.pomprtText = String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
                             + getResources().getString(R.string.success);
-                    myBinder.sendCommand(BT_command.cmd_device_ack);
+                    myBinder.sendCommand(BT_command.cmd_finger_input_done);
                     mHandlerMassage.leftEnable = -1;
                     mHandlerMassage.rightEnable = 1;
                     mHandlerMassage.rightText = getResources().getString(R.string.done);
@@ -164,6 +168,7 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                     //Scan_right.setText(R.string.done);
 
                 } else {
+                    Log.d(TAG, "保存 指纹失败");
                     mHandlerMassage.pomprtText = String.format(getResources().getString(R.string.fingerprint_progress), count + 1, maxCount + 1)
                             + getResources().getString(R.string.fail);
                     count--;
@@ -177,7 +182,6 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                     msg.what = GetIDFail;
                 } else {
                     Log.d(TAG, "获取ｉｄ成功");
-                    byte[] FingerID=new byte[0];
                     FingerID[0]=data[7];
                     myBinder.sendCommand(BT_command.cmd_check_ID, FingerID);
                     msg.what = GetIDSuccess;
@@ -185,8 +189,13 @@ public class FingerprintManageActivity extends AppCompatActivity implements Blue
                 break;
             case BT_command.cmd_check_ID:
                 if (data[6] == 0x01) {
-                    Log.d(TAG, "注册ｉｄ失败");
-                    msg.what = CheckIDFail;
+                    if(FingerID[0]>20) {
+                        Log.d(TAG, "注册ｉｄ失败");
+                        msg.what = CheckIDFail;
+                    }else{
+                        FingerID[0]=(byte)(FingerID[0]+1);
+                        myBinder.sendCommand(BT_command.cmd_check_ID, FingerID);
+                    }
                 }else if (data[6] == 0x00){
                     Log.d(TAG, "注册ｉｄ成功");
                     msg.what = CheckIDSuccess;
