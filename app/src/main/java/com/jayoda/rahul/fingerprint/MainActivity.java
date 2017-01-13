@@ -103,6 +103,10 @@ public class MainActivity extends AppCompatActivity implements BlueToothMsg.Call
                 Intent ReportIn=new Intent(MainActivity.this,ReportActivity.class);
                 startActivity(ReportIn);
                 break;
+            case R.id.action_time:
+                Intent tmset=new Intent(MainActivity.this, DeviceTimeSetting.class);
+                startActivity(tmset);
+                break;
             case R.id.action_del:
                 myBinder.sendCommand(BT_command.cmd_del_finger);
             default:

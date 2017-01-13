@@ -14,6 +14,12 @@
         android:icon="@android:drawable/ic_menu_info_details"
         app:showAsAction="always" />
     <item
+        android:id="@+id/action_time"
+        android:orderInCategory="100"
+        android:title="@string/all_time"
+        android:icon="@android:drawable/ic_menu_info_details"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_del"
         android:orderInCategory="100"
         android:title="清除所有指纹"
